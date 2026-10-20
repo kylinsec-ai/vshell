@@ -1,22 +1,8 @@
-// Package utils — DingDing & WeChat robot notification system.
-// 钉钉 / 企业微信机器人告警系统：新 Agent 上线、离线、监听启停、错误等事件推送。
+// Package utils provides notification helpers for configured DingDing and WeChat webhooks.
 //
-// Reverse-engineered from the original vshell binary (v_windows_amd64.exe).
-//
-// The original binary sends notifications to DingDing (钉钉) and/or WeChat (微信)
-// robots when significant events occur:
-//   - New agent checks in
-//   - Agent goes offline
-//   - Listener starts/stops
-//   - Errors or warnings
-//
-// Evidence:
-//   - Original setting.conf field: dingding_access_token, dingding_key_word
-//   - Original setting.conf field: wx_key
-//   - Frontend references notification settings
-//
-// Confidence: MEDIUM (config fields confirmed; exact HTTP payload format
-// for DingDing/WeChat webhook API is standard and well-documented)
+// The implementation can emit notifications for selected application events. The exact
+// compatibility with any separately analyzed binary is not guaranteed; webhook behavior
+// should be verified against tests and the providers' current API documentation.
 
 // Compatibility notes in this file describe the current implementation and available analysis evidence; they are not a guarantee of complete behavioral parity.
 // Treat security-sensitive assumptions as unverified until confirmed by tests or direct review.
