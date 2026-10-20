@@ -36,8 +36,6 @@ import (
 //   - Tencent Cloud COS
 //   - AWS S3
 //   - Custom HTTP endpoints
-
-// OSSProvider 表示云存储提供商。
 // OSSProvider represents a cloud storage provider.
 type OSSProvider string
 
@@ -47,8 +45,6 @@ const (
 	ProviderAWSS3    OSSProvider = "aws_s3"
 	ProviderCustom   OSSProvider = "custom_http"
 )
-
-// OSSConfig 保存特定提供商的配置。
 // OSSConfig holds configuration for a specific provider.
 type OSSUploadConfig struct {
 	Provider    OSSProvider `json:"provider"`
@@ -60,8 +56,6 @@ type OSSUploadConfig struct {
 	CustomURL   string      `json:"custom_url,omitempty"`
 	CDNDomain   string      `json:"cdn_domain,omitempty"` // CDN加速域名
 }
-
-// OSSUploadResult 保存一次上传操作的结果。
 // OSSUploadResult holds the result of an upload operation.
 type OSSUploadResult struct {
 	Success  bool   `json:"success"`
@@ -71,15 +65,11 @@ type OSSUploadResult struct {
 	ETag     string `json:"etag,omitempty"`
 	Error    string `json:"error,omitempty"`
 }
-
-// OSSUploader 处理云存储上传。
 // OSSUploader handles cloud storage uploads.
 type OSSUploader struct {
 	config *OSSUploadConfig
 	client *http.Client
 }
-
-// NewOSSUploader 以给定配置创建上传器。
 // NewOSSUploader creates a new uploader with the given config.
 func NewOSSUploader(config *OSSUploadConfig) *OSSUploader {
 	return &OSSUploader{
@@ -89,8 +79,6 @@ func NewOSSUploader(config *OSSUploadConfig) *OSSUploader {
 		},
 	}
 }
-
-// Upload 将数据上传到配置的 OSS 提供商。
 // Upload uploads data to the configured OSS provider.
 func (ou *OSSUploader) Upload(data []byte, filename string) (*OSSUploadResult, error) {
 	switch ou.config.Provider {
@@ -106,8 +94,6 @@ func (ou *OSSUploader) Upload(data []byte, filename string) (*OSSUploadResult, e
 		return ou.uploadToCustom(data, filename)
 	}
 }
-
-// UploadFile 将本地文件上传到 OSS。
 // UploadFile uploads a local file to OSS.
 func (ou *OSSUploader) UploadFile(localPath string) (*OSSUploadResult, error) {
 	data, err := os.ReadFile(localPath)
@@ -325,8 +311,6 @@ func (ou *OSSUploader) uploadToCustom(data []byte, filename string) (*OSSUploadR
 // ============================================================================
 // Distribution URL builder
 // ============================================================================
-
-// GenerateDistributionURLs 为所有配置的提供商生成下载 URL。
 // GenerateDistributionURLs generates download URLs for all configured providers.
 func GenerateDistributionURLs(listener *Listener) []string {
 	if listener.OssUrl == "" {
@@ -353,20 +337,14 @@ func GenerateDistributionURLs(listener *Listener) []string {
 // ============================================================================
 // Agent Payload Distribution Service
 // ============================================================================
-
-// DistributionService 管理向 OSS/CDN 分发 Agent 载荷。
 // DistributionService manages agent payload distribution to OSS/CDN.
 type DistributionService struct {
 	configs []*OSSUploadConfig
 }
-
-// NewDistributionService 创建分发服务。
 // NewDistributionService creates a distribution service.
 func NewDistributionService(configs ...*OSSUploadConfig) *DistributionService {
 	return &DistributionService{configs: configs}
 }
-
-// DistributePayload 将载荷上传到所有配置的提供商。
 // DistributePayload uploads a payload to all configured providers.
 func (ds *DistributionService) DistributePayload(data []byte, filename string) ([]*OSSUploadResult, error) {
 	var results []*OSSUploadResult
@@ -388,8 +366,6 @@ func (ds *DistributionService) DistributePayload(data []byte, filename string) (
 
 	return results, nil
 }
-
-// DistributeAgent 构建 Agent 载荷并分发。
 // DistributeAgent builds an agent payload and distributes it.
 func (ds *DistributionService) DistributeAgent(info *AgentBuildInfo, listener *Listener) ([]string, error) {
 	builder := NewPayloadBuilder(NewTemplateRepository("."))
@@ -420,8 +396,6 @@ func (ds *DistributionService) DistributeAgent(info *AgentBuildInfo, listener *L
 // ============================================================================
 // Upload history tracking
 // ============================================================================
-
-// UploadRecord 跟踪一次上传操作。
 // UploadRecord tracks a single upload operation.
 type UploadRecord struct {
 	ID        int64     `json:"id"`
@@ -435,8 +409,6 @@ type UploadRecord struct {
 
 var uploadHistory []UploadRecord
 var uploadHistoryMu sync.Mutex
-
-// RecordUpload 将一次上传加入历史记录。
 // RecordUpload adds an upload to history.
 func RecordUpload(filename, provider, url string, size int64, etag string) {
 	uploadHistoryMu.Lock()
@@ -457,8 +429,6 @@ func RecordUpload(filename, provider, url string, size int64, etag string) {
 		uploadHistory = uploadHistory[len(uploadHistory)-100:]
 	}
 }
-
-// GetUploadHistory 返回上传历史。
 // GetUploadHistory returns the upload history.
 func GetUploadHistory() []UploadRecord {
 	uploadHistoryMu.Lock()
@@ -472,8 +442,6 @@ func GetUploadHistory() []UploadRecord {
 // ============================================================================
 // Download progress tracking for agents
 // ============================================================================
-
-// DownloadProgress 跟踪文件下载进度。
 // DownloadProgress tracks file download progress.
 type DownloadProgress struct {
 	ID          string    `json:"id"`
@@ -490,8 +458,6 @@ type DownloadProgress struct {
 
 var downloadProgress = make(map[string]*DownloadProgress)
 var downloadProgressMu sync.RWMutex
-
-// StartDownloadProgress 跟踪新的下载。
 // StartDownloadProgress tracks a new download.
 func StartDownloadProgress(clientID int64, filename string, totalSize int64) string {
 	downloadProgressMu.Lock()
@@ -509,8 +475,6 @@ func StartDownloadProgress(clientID int64, filename string, totalSize int64) str
 	}
 	return id
 }
-
-// UpdateDownloadProgress 更新下载进度。
 // UpdateDownloadProgress updates a download's progress.
 func UpdateDownloadProgress(id string, bytesDownloaded int64) {
 	downloadProgressMu.Lock()
@@ -535,8 +499,6 @@ func UpdateDownloadProgress(id string, bytesDownloaded int64) {
 		}
 	}
 }
-
-// CompleteDownloadProgress 标记下载完成。
 // CompleteDownloadProgress marks a download as complete.
 func CompleteDownloadProgress(id string, success bool) {
 	downloadProgressMu.Lock()
@@ -555,8 +517,6 @@ func CompleteDownloadProgress(id string, success bool) {
 		delete(downloadProgress, id)
 	}
 }
-
-// GetDownloadProgress 按 ID 返回下载进度。
 // GetDownloadProgress returns download progress by ID.
 func GetDownloadProgress(id string) *DownloadProgress {
 	downloadProgressMu.RLock()
