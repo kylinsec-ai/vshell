@@ -1,4 +1,4 @@
-// Package c2engine — C2 引擎，1:1 对齐原版二进制的引擎包 eSxbx2zKVifD。
+// Package c2engine — C2 引擎，根据当前逆向证据重建；行为等价性仍需逐项验证的引擎包 eSxbx2zKVifD。
 //
 // 对齐依据（funcnametab 可验证的类型与方法，地址见 .re/REAL_ENGINE_INVENTORY）：
 //   - 类型：Client / Listener / Task / Host / Tunnel / Flow / Health / Target / PairList
