@@ -1,4 +1,3 @@
-// Package c2engine/stream_hub 实现终端与屏幕实时流的查看者注册表。
 // Package c2engine/stream_hub implements the viewer registry that relays an
 // agent's live terminal output and screen frames to web-panel WebSocket
 // viewers.
@@ -26,14 +25,10 @@ import (
 	"strings"
 	"sync"
 )
-
-// StreamViewer 是一个 WebSocket 查看者（终端或屏幕）。
 // StreamViewer is a single WebSocket viewer (terminal or screen).
 type StreamViewer interface {
-	// SendBinary 向查看者发送二进制帧（屏幕帧：zlib 压缩图像）。
 	// SendBinary sends a binary frame (screen frames: zlib-compressed image).
 	SendBinary(data []byte) error
-	// SendText 向查看者发送文本帧（终端输出：原始 shell 字节）。
 	// SendText(data []byte) sends a text frame (terminal output: raw shell bytes).
 	SendText(data []byte) error
 	// SendJSON 向查看者发送控制消息（{type:"10"} 等）。
@@ -41,8 +36,6 @@ type StreamViewer interface {
 	// Close 关闭查看者连接。
 	Close() error
 }
-
-// streamKind 区分终端流与屏幕流（二者按客户端 ID 各自独立注册）。
 // streamKind distinguishes the terminal stream from the screen stream; the two
 // register independently under the same client ID.
 type streamKind int
@@ -58,15 +51,11 @@ var (
 	streamViewers  = map[streamKind]map[int64]map[StreamViewer]struct{}{}
 	streamSessions = map[streamKind]map[int64]*StreamSession{}
 )
-
-// StreamTerminal / StreamScreen 是查看会话的流类型标识。
 // StreamTerminal / StreamScreen identify a viewing session's stream kind.
 const (
 	StreamTerminal = "terminal"
 	StreamScreen   = "screen"
 )
-
-// StreamTimeout 是查看会话命令的默认超时（秒）。
 // StreamTimeout is the default timeout for viewing-session commands.
 //
 // Interactive commands (terminal_start/input, screen_capture_start) are
@@ -74,8 +63,6 @@ const (
 // then streams output through separate result submissions, so a long timeout
 // would only delay stuck-task cleanup.
 const StreamTimeout = 5
-
-// StreamSession 是一次查看会话（一个查看者 + 该查看者归属的任务 ID）。
 // StreamSession is one viewing session: a viewer plus the task ID that carries
 // this viewer's traffic down to the agent.
 type StreamSession struct {
@@ -83,8 +70,6 @@ type StreamSession struct {
 	ClientID int64
 	TaskID   int64
 }
-
-// RegisterViewer 登记一个查看者。
 // RegisterViewer adds a viewer to the (kind, clientID) set.
 func RegisterViewer(kind string, clientID int64, v StreamViewer) {
 	k := parseStreamKind(kind)
@@ -102,8 +87,6 @@ func RegisterViewer(kind string, clientID int64, v StreamViewer) {
 	}
 	set[v] = struct{}{}
 }
-
-// UnregisterViewer 注销一个查看者。
 // UnregisterViewer removes a viewer from the (kind, clientID) set.
 func UnregisterViewer(kind string, clientID int64, v StreamViewer) {
 	k := parseStreamKind(kind)
@@ -120,8 +103,6 @@ func UnregisterViewer(kind string, clientID int64, v StreamViewer) {
 		}
 	}
 }
-
-// ViewerCount 返回某客户端某类流的查看者数量（测试与诊断用）。
 // ViewerCount returns how many viewers watch a given client's stream.
 func ViewerCount(kind string, clientID int64) int {
 	k := parseStreamKind(kind)
@@ -132,8 +113,6 @@ func ViewerCount(kind string, clientID int64) int {
 	}
 	return 0
 }
-
-// SetStreamSession 记录查看会话（查看者 <-> 代理任务 ID）。
 // SetStreamSession records a viewing session (viewer -> agent task ID).
 func SetStreamSession(kind string, clientID int64, s *StreamSession) {
 	k := parseStreamKind(kind)
@@ -146,8 +125,6 @@ func SetStreamSession(kind string, clientID int64, s *StreamSession) {
 	}
 	m[clientID] = s
 }
-
-// GetStreamSession 取回查看会话。
 // GetStreamSession returns the viewing session for a client, if any.
 func GetStreamSession(kind string, clientID int64) *StreamSession {
 	k := parseStreamKind(kind)
@@ -158,8 +135,6 @@ func GetStreamSession(kind string, clientID int64) *StreamSession {
 	}
 	return nil
 }
-
-// ClearStreamSession 清除查看会话。
 // ClearStreamSession drops the viewing session for a client.
 func ClearStreamSession(kind string, clientID int64) {
 	k := parseStreamKind(kind)
@@ -169,8 +144,6 @@ func ClearStreamSession(kind string, clientID int64) {
 		delete(m, clientID)
 	}
 }
-
-// publish 把一帧载荷投递给某客户端某类流的全部查看者，返回投递到的查看者数。
 // publish fans a payload out to every viewer of (kind, clientID) and returns
 // how many viewers accepted it.
 func publish(kind streamKind, clientID int64, payload []byte, binary bool) int {
@@ -197,8 +170,6 @@ func publish(kind streamKind, clientID int64, payload []byte, binary bool) int {
 	}
 	return delivered
 }
-
-// streamResultPrefix 与 agent 端提交的流式结果前缀一致。
 // streamResultPrefix matches the prefixes the agent uses for streaming results.
 const (
 	terminalResultPrefix = "terminal_output:"
@@ -248,8 +219,6 @@ func HandleStreamingResult(clientID int64, result string) bool {
 	}
 	return false
 }
-
-// StreamSessionTaskID 返回查看会话当前的代理任务 ID（0 表示无）。
 // StreamSessionTaskID returns the session's current agent task ID (0 = none).
 func StreamSessionTaskID(kind string, clientID int64) int64 {
 	if s := GetStreamSession(kind, clientID); s != nil {
