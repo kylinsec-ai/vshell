@@ -1,6 +1,6 @@
 package c2engine
 
-// Storage - SQLite persistence (1:1 aligned with eSxbx2zKVifD.ZSeQgw1dB4ft).
+// Storage - SQLite persistence (compared against available reverse-engineering evidence; parity remains to be verified against tests for eSxbx2zKVifD.ZSeQgw1dB4ft).
 //
 // All SQL statements below are DECODED from the original binary's garble-
 // encrypted string builders (see .re/SQL_SCHEMA.txt):
