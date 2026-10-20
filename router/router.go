@@ -1,8 +1,10 @@
-// Package router — 路由注册，1:1 对齐原版二进制。
+// Package router registers the HTTP routes exposed by this implementation.
 //
-// 原版基于 beego 框架：所有 API 控制器经 web.Router 注册（路径与内嵌前端
-// url 对应，前缀 /api）。控制器基类 ApiBaseController.Prepare 负责 token 校验
-// （除 /api/login 外均需有效 token），因此不再需要额外的全局认证中间件。
+// Route paths are cross-checked against frontend references and reverse-
+// engineering notes, but that alone does not establish complete parity with
+// the original binary. Authentication behavior depends on each controller's
+// preparation and handler logic; review those paths before assuming a route
+// is protected. Do not treat this package comment as a security guarantee.
 package router
 
 import (
@@ -21,8 +23,9 @@ import (
 
 var apiOnce sync.Once
 
-// registerAPIRoutes 注册原版 API 路由（路径来自内嵌前端 JS 的 url:"..." 与
-// WebSocket 连接串，见 .re/ 分析记录；控制器类型与方法来自 funcnametab）。
+// registerAPIRoutes registers routes identified in the current frontend and
+// reverse-engineering notes. These references help locate candidate endpoints,
+// but each route and handler still requires behavioral verification.
 func registerAPIRoutes() {
 	apiOnce.Do(func() {
 		// 登录
