@@ -12,14 +12,14 @@ import (
 
 // Log levels use a syslog-style scale: 0 is most severe and 7 is most verbose.
 const (
-	LevelEmergency     = 0 // 紧急 / emergency
-	LevelAlert         = 1 // 警报 / alert
-	LevelCritical      = 2 // 严重 / critical
-	LevelError         = 3 // 错误 / error
-	LevelWarning       = 4 // 警告 / warning
-	LevelNotice        = 5 // 提示 / notice
-	LevelInformational = 6 // 信息 / informational
-	LevelDebug         = 7 // 调试 / debug
+	LevelEmergency     = 0 // Emergency
+	LevelAlert         = 1 // Alert
+	LevelCritical      = 2 // Critical
+	LevelError         = 3 // Error
+	LevelWarning       = 4 // Warning
+	LevelNotice        = 5 // Notice
+	LevelInformational = 6 // Informational
+	LevelDebug         = 7 // Debug
 )
 
 var (
