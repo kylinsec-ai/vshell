@@ -66,13 +66,11 @@ var (
 	fullCfgMu   sync.RWMutex
 )
 
-// defaultConfigPath 返回配置文件路径（可用 VSHELL_CONF 环境变量覆盖）。
-// 原版二进制使用相对可执行文件的 "conf/setting.conf"。
-// defaultConfigPath returns the path to the config file.
-// The original binary uses "conf/setting.conf" relative to the executable.
-// Confidence: HIGH (directly observable from original directory structure)
+// defaultConfigPath returns the configuration path, honoring VSHELL_CONF when set.
+// Otherwise it uses conf/setting.conf relative to the current working directory.
+// This describes the current implementation; it does not establish parity with another binary.
 func defaultConfigPath() string {
-	// Try environment override first
+	// An explicit environment override takes precedence over the default path.
 	if env := os.Getenv("VSHELL_CONF"); env != "" {
 		return env
 	}
