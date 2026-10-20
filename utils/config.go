@@ -1,13 +1,10 @@
-// Package utils — Config file parser and settings management.
-// 配置解析与设置管理：解析原版 vshell 的 conf/setting.conf（INI 风格，key=value，# 为注释）。
+// Package utils contains configuration parsing and application settings.
 //
-// Reverse-engineered from the original vshell binary (v_windows_amd64.exe).
-// The original binary reads conf/setting.conf at startup using an INI-like
-// format with # comments and key=value pairs. String keys are XOR-obfuscated
-// in the binary; the keys below are the plaintext equivalents.
-//
-// Evidence: Original setting.conf from vshell(原版)/conf/setting.conf
-// Confidence: HIGH (config file format is directly observable)
+// The parser supports an INI-like key=value format with # comments. Some
+// names and defaults were compared with a recovered setting.conf and the
+// original binary; those comparisons are evidence for specific fields only,
+// not proof that every setting or runtime behavior is identical.
+// 配置格式及字段映射来自当前实现与可获取样本的对照；未验证的兼容性应视为待确认。
 
 package utils
 
@@ -20,13 +17,8 @@ import (
 	"sync"
 )
 
-// ============================================================================
-// FullSettings — complete configuration matching the original binary
-// ============================================================================
-
-// FullSettings 保存 conf/setting.conf 的全部配置，对应原版配置加载器解析的结构体。
-// FullSettings holds all configuration from conf/setting.conf.
-// Mirrors the struct parsed by the original binary's config loader.
+// FullSettings stores settings understood by this implementation.
+// It is not a guarantee that every field matches the original binary exactly.
 type FullSettings struct {
 	// License
 	License string // RSA-encrypted license key (base64)
@@ -87,9 +79,11 @@ func defaultConfigPath() string {
 	return "conf/setting.conf"
 }
 
-// LoadConfig 读取并解析配置文件；文件缺失时回退到默认配置（与原版行为一致）。
-// LoadConfig reads and parses the configuration file.
-// Returns the parsed config; falls back to defaults if the file is missing.
+// LoadConfig reads path and parses supported key=value settings.
+// An empty path selects defaultConfigPath. If the file cannot be opened, this
+// implementation returns defaults; parse errors are returned to the caller.
+// Note that an open failure is treated as a fallback, not distinguished from
+// a missing file, so callers should not assume configuration was loaded.
 func LoadConfig(path string) (*FullSettings, error) {
 	if path == "" {
 		path = defaultConfigPath()
@@ -111,9 +105,9 @@ func LoadConfig(path string) (*FullSettings, error) {
 	return cfg, nil
 }
 
-// GetFullSettings 返回已加载的配置（单例，首次调用时读取 conf/setting.conf）。
-// GetFullSettings returns the loaded configuration (singleton).
-// Loads from conf/setting.conf on first call.
+// GetFullSettings returns the process-wide settings instance, loading it on
+// the first call. Parse errors currently fall back to defaults, so this API
+// does not expose configuration-loading failures to callers.
 func GetFullSettings() *FullSettings {
 	fullCfgOnce.Do(func() {
 		cfg, err := LoadConfig("")
@@ -144,8 +138,9 @@ func SetFullSettingsForTest(cfg *FullSettings) {
 	fullCfgMu.Unlock()
 }
 
-// ReloadConfig 重新读取配置文件（用于运行时配置热更新）。
-// ReloadConfig re-reads the config file (useful for runtime config changes).
+// ReloadConfig parses the requested file and replaces the in-memory settings.
+// It does not itself coordinate consumers that may already hold the old
+// pointer; callers must account for that when reloading during concurrent use.
 func ReloadConfig(path string) error {
 	cfg, err := LoadConfig(path)
 	if err != nil {
@@ -189,9 +184,10 @@ func SaveConfig(cfg *FullSettings, path string) error {
 	return nil
 }
 
-// UpdateConfig 对当前配置应用部分更新并保存。
-// UpdateConfig applies partial updates to the current config and saves.
-// Only non-empty/non-zero fields in updates are applied.
+// UpdateConfig applies supported keys from updates and persists the result.
+// Values are converted to strings before parsing. Because this mutates the
+// current settings pointer, callers should avoid concurrent unsynchronized
+// reads or writes while an update is in progress.
 func UpdateConfig(updates map[string]interface{}, path string) error {
 	cfg := GetFullSettings()
 
