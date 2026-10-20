@@ -1,11 +1,7 @@
-// Package controllers — 终端控制器，根据当前逆向证据重建；行为等价性仍需逐项验证。
-//
-// 真实方法（funcnametab + 反编译地址）与前端路由：
-//
-//	Ws     0x18f06c0   GET /api/terminal/ws?id=<id>&token=<token>  交互终端 WebSocket
-//	Shell  0x18f0c80   POST /terminal/shell                         执行单条命令
-//
-// 前端内嵌 JS：`ws://host/api/terminal/ws?id="+t+"&token="+j`（xterm.js + attach addon）。
+// Package controllers implements HTTP handlers for the web management interface.
+// Terminal access is handled by the current router and session-validation paths;
+// historical endpoint notes should not be treated as proof of compatibility.
+
 package controllers
 
 import (
