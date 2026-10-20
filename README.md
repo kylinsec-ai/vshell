@@ -10,7 +10,7 @@ An incomplete, independent re-implementation study of the VShell v3.0 framework,
 
 </div>
 
-> **Research notice:** This project is incomplete and intended for security research and learning in authorized environments only. It is unofficial, is not affiliated with the original author, and does not include the original software license. Behavior and protocol compatibility are not guaranteed.
+> **Research notice:** An incomplete, unofficial reverse-engineering study for authorized security research only. It is not affiliated with the original author, does not include the original software license, and does not guarantee behavioral or protocol compatibility.
 
 [![Go](https://img.shields.io/badge/Go-1.25-00ADD8?logo=go&logoColor=white)](https://go.dev/dl/)
 [![Research](https://img.shields.io/badge/focus-reverse%20engineering-64748b)](#reverse-engineering-status)
