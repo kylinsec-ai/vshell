@@ -1,15 +1,6 @@
-// Package controllers — 客户端管理控制器，根据当前逆向证据重建；行为等价性仍需逐项验证。
-//
-// 真实方法（funcnametab + 反编译地址）：
-//
-//	List       0x18d9dc0   POST /client/list        分页客户端列表
-//	Add        0x18db980   POST /client/add         添加客户端（ip 参数）
-//	EditRemark 0x18dbd80   POST /client/editremark  修改备注
-//	DelFile    0x18dbe80   POST /client/delfile     删除客户端文件
-//	DelProcess 0x18dc180   POST /client/delprocess  结束客户端进程
-//	DelList    0x18dc2c0   POST /client/dellist     批量删除客户端
-//
-// 注意：原版不存在 Block / Unblock / Note / CheckIn 方法。
+// Package controllers implements handlers for the client-management API.
+// The endpoint surface and response fields reflect this implementation; inferred
+// compatibility with another binary should be verified independently.
 package controllers
 
 import (
@@ -17,17 +8,13 @@ import (
 	"strings"
 )
 
-// ClientController 管理已连接的 Agent 客户端。
-// 原版嵌入 ApiBaseController（beego），JsonGet/JsonGetInt/JsonOkResult 等
-// 方法由编译器为每个控制器生成转发包装。
+// ClientController handles client records exposed by the management API.
 type ClientController struct {
 	ApiBaseController
 }
 
-// List 分页列出客户端（POST /client/list）。
-// 反编译（0x18d9dc0）参数：page / pageSize / status / field / order / search / sort；
-// 响应键（已解码二进制字符串）：clientCount / clientOnlineCount / total / items，
-// 每项含 Port / DnsPort 字段。status=1 仅在线、status=2 仅离线。
+// List returns a page of client records. A status value of 1 filters to online
+// clients and 2 filters to offline clients; other values do not apply that filter.
 func (c *ClientController) List() {
 	page := c.JsonGetInt("page")
 	if page < 1 {
