@@ -1,3 +1,6 @@
+// Compatibility notes in this file describe the current implementation and available analysis evidence; they are not a guarantee of complete behavioral parity.
+// Treat security-sensitive assumptions as unverified until confirmed by tests or direct review.
+
 package c2engine
 
 import (
