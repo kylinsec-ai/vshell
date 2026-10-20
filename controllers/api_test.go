@@ -9,7 +9,7 @@ import (
 	"github.com/beego/beego/v2/server/web/context"
 )
 
-// 测试真实 JSON 响应格式（与反编译还原一致）：
+// Verify the JSON response shape observed by this test; this does not establish parity with another binary.
 //
 //	JsonOkResult: {"code":0,"message":"ok","type":"success","result":<data>}
 //	JsonOkMessage:{"code":0,"message":"ok","type":<msg>}
