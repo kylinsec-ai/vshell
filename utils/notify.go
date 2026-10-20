@@ -4,8 +4,8 @@
 // compatibility with any separately analyzed binary is not guaranteed; webhook behavior
 // should be verified against tests and the providers' current API documentation.
 
-// Compatibility notes in this file describe the current implementation and available analysis evidence; they are not a guarantee of complete behavioral parity.
-// Treat security-sensitive assumptions as unverified until confirmed by tests or direct review.
+// Compatibility notes describe the current implementation, not guaranteed parity with another binary.
+// Verify security-sensitive assumptions through tests or direct review.
 
 package utils
 
@@ -41,7 +41,6 @@ const (
 	EventWarning       NotifyEvent = "warning"
 )
 
-// NotifyPayload 保存单条事件的通知数据。
 // NotifyPayload holds the notification data for a single event.
 type NotifyPayload struct {
 	Event     NotifyEvent `json:"event"`
@@ -55,8 +54,7 @@ type NotifyPayload struct {
 // Notifier — sends notifications to configured channels
 // ============================================================================
 
-// Notifier 管理向钉钉/企业微信机器人发送通知。
-// Notifier manages notification delivery to DingDing/WeChat robots.
+// Notifier manages notification delivery to configured DingDing and WeChat Work webhooks.
 type Notifier struct {
 	mu       sync.RWMutex
 	cfg      *FullSettings
@@ -70,8 +68,7 @@ var (
 	notifierOnce sync.Once
 )
 
-// GetNotifier 返回全局通知管理器（单例）。
-// GetNotifier returns the global notification manager.
+// GetNotifier returns the process-wide notification manager.
 func GetNotifier() *Notifier {
 	notifierOnce.Do(func() {
 		notifier = &Notifier{
