@@ -1,18 +1,20 @@
+<div align="center">
+
 # VShell
 
-> **An incomplete reverse-engineered re-implementation of the in-the-wild exploited C2 framework "VShell"**
+**Reverse-Engineering Research · Go**
 
-[![Go Version](https://img.shields.io/badge/Go-1.25-blue)](https://go.dev/dl/)
-[![License](https://img.shields.io/badge/license-All%20Rights%20Reserved-red)](license.txt)
-[![中文文档](https://img.shields.io/badge/docs-简体中文-green)](README.zh-CN.md)
+An incomplete, independent re-implementation study of the VShell v3.0 framework, based on binary analysis and behavioral verification.
 
-> **⚠️ Disclaimer**
->
-> This repository is an **incomplete** reverse-engineering / re-implementation of the in-the-wild exploited C2 framework **VShell** (v3.0), for security research and learning purposes only.
->
-> - **For authorized testing only.** Any unlawful use is prohibited.
-> - Unofficial, unaffiliated with the original author; all rights of the original software remain with its author.
-> - Functionality differs from the original; some modules are missing or behave differently.
+[English](README.md) · [简体中文](README.zh-CN.md)
+
+</div>
+
+> **Research notice:** This project is incomplete and intended for security research and learning in authorized environments only. It is unofficial, is not affiliated with the original author, and does not include the original software license. Behavior and protocol compatibility are not guaranteed.
+
+[![Go](https://img.shields.io/badge/Go-1.25-00ADD8?logo=go&logoColor=white)](https://go.dev/dl/)
+[![Research](https://img.shields.io/badge/focus-reverse%20engineering-64748b)](#reverse-engineering-status)
+[![License](https://img.shields.io/badge/license-see%20license.txt-red)](license.txt)
 
 ---
 
