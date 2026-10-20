@@ -1,5 +1,4 @@
-// Package utils 提供日志、配置、认证与通知等通用工具。
-// Package utils provides common utilities: logging, configuration, auth, and notifications.
+// Package utils provides shared logging, configuration, authentication, and notification helpers.
 package utils
 
 import (
@@ -11,8 +10,7 @@ import (
 	"sync"
 )
 
-// 日志级别：遵循 syslog 风格（0 最严重，7 最详细）。
-// Log levels: syslog-style scale (0 most severe, 7 most verbose).
+// Log levels use a syslog-style scale: 0 is most severe and 7 is most verbose.
 const (
 	LevelEmergency     = 0 // 紧急 / emergency
 	LevelAlert         = 1 // 警报 / alert
@@ -25,25 +23,22 @@ const (
 )
 
 var (
-	loggerMu        sync.RWMutex       // 保护日志配置的读写锁 / guards logger configuration
-	configuredLevel           = LevelDebug // 当前生效的日志级别 / current effective log level
-	configuredOut   io.Writer = os.Stderr // 当前日志输出目标 / current log output target
+	loggerMu        sync.RWMutex       // Protects reads and updates to logger configuration.
+	configuredLevel           = LevelDebug // Current threshold; messages at or below it are emitted.
+	configuredOut   io.Writer = os.Stderr // Default destination until configuration overrides it.
 )
 
-// LoggerCloser 返回给调用方，用于在退出时关闭日志文件。
-// LoggerCloser is returned to the caller to close the log file on exit.
+// LoggerCloser lets callers close the configured log file during shutdown.
 type LoggerCloser interface {
 	io.Closer
 }
 
-// loggerCloser 封装日志文件句柄，实现 LoggerCloser。
-// loggerCloser wraps the log file handle, implementing LoggerCloser.
+// loggerCloser adapts an open file to the LoggerCloser interface.
 type loggerCloser struct {
 	file *os.File
 }
 
-// Close 关闭日志文件。
-// Close closes the log file.
+// Close closes the underlying file; a nil receiver or file is a no-op.
 func (c *loggerCloser) Close() error {
 	if c == nil || c.file == nil {
 		return nil
@@ -51,14 +46,12 @@ func (c *loggerCloser) Close() error {
 	return c.file.Close()
 }
 
-// levelWriter 是日志输出适配器，保证读取配置时并发安全。
-// levelWriter adapts the log output writer with concurrency-safe config reads.
+// levelWriter forwards log output while reading the current destination under the configuration lock.
 type levelWriter struct {
 	writer io.Writer
 }
 
-// Write 将日志字节写入底层输出。
-// Write forwards log bytes to the underlying writer.
+// Write forwards p to the current output destination. A nil destination discards the bytes.
 func (w *levelWriter) Write(p []byte) (int, error) {
 	loggerMu.RLock()
 	out := w.writer
@@ -69,8 +62,7 @@ func (w *levelWriter) Write(p []byte) (int, error) {
 	return out.Write(p)
 }
 
-// Sync 若底层输出支持则执行同步刷新。
-// Sync flushes the underlying writer if it supports it.
+// Sync calls the destination's Sync method when supported; other writers require no action.
 func (w *levelWriter) Sync() error {
 	loggerMu.RLock()
 	out := w.writer
@@ -81,11 +73,9 @@ func (w *levelWriter) Sync() error {
 	return nil
 }
 
-// ConfigureLogger 依据原版 setting.conf 应用 log_level 与 log_path。
-// 日志级别遵循配置文件中的 syslog 风格刻度：0=Emergency ... 7=Debug，level <= 配置级别时输出。
-// ConfigureLogger applies log_level and log_path from the original setting.conf.
-// log_level follows the syslog-style scale documented in the config file:
-// 0=Emergency ... 7=Debug. A message is emitted when level <= configured level.
+// ConfigureLogger applies log_level and log_path from the supplied settings.
+// Levels follow a syslog-style scale (0=Emergency through 7=Debug); a message is emitted
+// when its level is less than or equal to the configured threshold.
 func ConfigureLogger(cfg *FullSettings) (LoggerCloser, error) {
 	if cfg == nil {
 		cfg = defaultFullSettings()
