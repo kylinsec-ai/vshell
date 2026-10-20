@@ -1,16 +1,7 @@
-// Package controllers — 插件(Runner)控制器，根据当前逆向证据重建；行为等价性仍需逐项验证。
-//
-// 真实方法（funcnametab + 反编译地址）与前端路由：
-//
-//	List       0x18ed8a0   GET  /runner/list       插件列表
-//	RunPlugin  0x18edd80   POST /runner/runplugin  下发插件执行
-//	Upload     0x18eeb00   POST /runner/upload     上传插件
-//
-// 反编译参数集：
-//
-//	List:      id / name
-//	RunPlugin: id / name（插件名，按 .dll/.exe/.net 及 amd64 架构选择平台插件）
-//	Upload:    file
+// Package controllers implements plugin-management HTTP handlers.
+// Execution and upload behavior should be reviewed from the current implementation
+// and tests; historical analysis notes are not security or compatibility guarantees.
+
 package controllers
 
 import (

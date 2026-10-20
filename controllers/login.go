@@ -1,10 +1,6 @@
-// Package controllers — 登录控制器，根据当前逆向证据重建；行为等价性仍需逐项验证。
-//
-// 真实方法（funcnametab + 反编译地址）：
-//
-//	Login       0x18ed000   POST /login          用户名/密码登录
-//	Logout      0x18ed560   POST /logout         注销
-//	GetUserInfo 0x18ed5c0   GET  /getUserInfo    当前用户信息
+// Package controllers implements login, logout, and current-user information handlers.
+// The endpoint behavior in this reimplementation should be checked against tests; names
+// and response shapes inferred from analysis artifacts do not establish full parity.
 package controllers
 
 // LoginController 处理 Web 面板登录。

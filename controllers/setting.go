@@ -1,10 +1,6 @@
-// Package controllers — 设置控制器，根据当前逆向证据重建；行为等价性仍需逐项验证。
-//
-// 真实方法（funcnametab + 反编译地址）与前端路由：
-//
-//	Edit  0x18f02e0   POST /setting/edit  保存设置
-//
-// 反编译参数集：wx_key（企业微信机器人 key，通知配置）。
+// Package controllers contains handlers for application settings.
+// The currently implemented settings surface is limited; inferred routes or fields should
+// not be treated as proof of full compatibility with another implementation.
 package controllers
 
 // SettingController 管理面板设置。

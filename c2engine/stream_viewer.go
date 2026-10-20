@@ -1,4 +1,3 @@
-// Package c2engine/stream_viewer 提供 StreamViewer 的 gorilla/websocket 实现。
 // Package c2engine/stream_viewer provides the gorilla/websocket implementation
 // of StreamViewer, so the panel's WebSocket handlers can register a live viewer
 // with the StreamHub without c2engine importing controllers.
@@ -13,8 +12,6 @@ import (
 
 	"github.com/gorilla/websocket"
 )
-
-// wsStreamViewer 把一条 WebSocket 连接包装成 StreamViewer。
 // wsStreamViewer wraps one WebSocket connection as a StreamViewer.
 //
 // gorilla/websocket allows only one concurrent writer per connection, so every
@@ -25,8 +22,6 @@ type wsStreamViewer struct {
 	kind    string
 	client  int64
 }
-
-// NewWSStreamViewer 包装连接为查看者。
 // NewWSStreamViewer wraps a connection as a viewer.
 //
 // Callers must run a reader on the connection (the panel handlers do): a
@@ -35,8 +30,6 @@ type wsStreamViewer struct {
 func NewWSStreamViewer(conn *websocket.Conn, kind string, clientID int64) StreamViewer {
 	return &wsStreamViewer{conn: conn, kind: kind, client: clientID}
 }
-
-// CloseOnExit 让查看者连接在会话结束时退出（发送关闭帧后关闭连接）。
 // CloseOnExit ends the viewer connection when a session shuts down.
 func (v *wsStreamViewer) CloseOnExit() {
 	v.Close()

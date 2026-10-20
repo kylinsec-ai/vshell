@@ -1,25 +1,8 @@
-// Package utils — DingDing & WeChat robot notification system.
-// 钉钉 / 企业微信机器人告警系统：新 Agent 上线、离线、监听启停、错误等事件推送。
+// Package utils provides notification helpers for configured DingDing and WeChat webhooks.
 //
-// Reverse-engineered from the original vshell binary (v_windows_amd64.exe).
-//
-// The original binary sends notifications to DingDing (钉钉) and/or WeChat (微信)
-// robots when significant events occur:
-//   - New agent checks in
-//   - Agent goes offline
-//   - Listener starts/stops
-//   - Errors or warnings
-//
-// Evidence:
-//   - Original setting.conf field: dingding_access_token, dingding_key_word
-//   - Original setting.conf field: wx_key
-//   - Frontend references notification settings
-//
-// Confidence: MEDIUM (config fields confirmed; exact HTTP payload format
-// for DingDing/WeChat webhook API is standard and well-documented)
-
-// Compatibility notes in this file describe the current implementation and available analysis evidence; they are not a guarantee of complete behavioral parity.
-// Treat security-sensitive assumptions as unverified until confirmed by tests or direct review.
+// The implementation emits notifications for selected application events. Verify webhook
+// behavior against tests and current provider documentation; this does not establish parity
+// with any separately analyzed binary.
 
 package utils
 
@@ -42,7 +25,6 @@ import (
 // Notification types
 // ============================================================================
 
-// NotifyEvent 表示可触发通知的事件类型。
 // NotifyEvent represents a notification-triggering event.
 type NotifyEvent string
 
@@ -55,7 +37,6 @@ const (
 	EventWarning       NotifyEvent = "warning"
 )
 
-// NotifyPayload 保存单条事件的通知数据。
 // NotifyPayload holds the notification data for a single event.
 type NotifyPayload struct {
 	Event     NotifyEvent `json:"event"`
@@ -69,8 +50,7 @@ type NotifyPayload struct {
 // Notifier — sends notifications to configured channels
 // ============================================================================
 
-// Notifier 管理向钉钉/企业微信机器人发送通知。
-// Notifier manages notification delivery to DingDing/WeChat robots.
+// Notifier manages notification delivery to configured DingDing and WeChat Work webhooks.
 type Notifier struct {
 	mu       sync.RWMutex
 	cfg      *FullSettings
@@ -84,8 +64,7 @@ var (
 	notifierOnce sync.Once
 )
 
-// GetNotifier 返回全局通知管理器（单例）。
-// GetNotifier returns the global notification manager.
+// GetNotifier returns the process-wide notification manager.
 func GetNotifier() *Notifier {
 	notifierOnce.Do(func() {
 		notifier = &Notifier{

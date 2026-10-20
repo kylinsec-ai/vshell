@@ -1,9 +1,7 @@
-// Package controllers — 截图控制器，1:1 对齐原版二进制。
-//
-// 前端路由：/screenshot/get。
-// 说明：ScreenshotController 的 handler 方法名在 funcnametab 中被剥离（仅
-// Json* 包装方法保留），但其注册路由存在于内嵌前端（url:"/screenshot/get"），
-// 实际截图流由包级函数 D8MCqi8Dry3（0x18d9ba0，使用 "screen" 字符串）承担。
+// Package controllers implements screenshot-related HTTP handlers.
+// The current route and response behavior should be verified through implementation
+// and tests rather than inferred solely from historical analysis artifacts.
+
 package controllers
 
 import (

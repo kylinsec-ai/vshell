@@ -1,17 +1,7 @@
-// Package controllers — 监听器控制器，根据当前逆向证据重建；行为等价性仍需逐项验证。
-//
-// 真实方法（funcnametab + 反编译地址）：
-//
-//	List       0x18ea020   POST /listener/list      分页监听器列表
-//	EditRemark 0x18ebe80   POST /listener/editremark 修改备注
-//	DelList    0x18ebf80   POST /listener/dellist    批量删除
-//	Del        0x18ec040   POST /listener/del        删除单个
-//	Stop       0x18ec140   POST /listener/stop       停止
-//	Start      0x18ec1e0   POST /listener/start      启动
-//	Edit       0x18ec280   POST /listener/edit       编辑
-//	Add        0x18ec880   POST /listener/add        新增
-//
-// 前端路由（内嵌 JS url:"/listener/..."）与之对应。
+// Package controllers implements listener-management HTTP handlers.
+// The available operations and their effects are defined by the current implementation;
+// historical endpoint maps should not be treated as proof of behavioral parity.
+
 package controllers
 
 // ListenerController 管理 C2 监听器。

@@ -28,14 +28,14 @@ var apiOnce sync.Once
 // but each route and handler still requires behavioral verification.
 func registerAPIRoutes() {
 	apiOnce.Do(func() {
-		// 登录
+		// Authentication
 		beego.Router("/api/login", &controllers.LoginController{}, "post:Login")
 		beego.Router("/api/logout", &controllers.LoginController{}, "get:Logout;post:Logout")
 
-		// 仪表盘
+		// Dashboard
 		beego.Router("/api/dashboard/info", &controllers.DashboardController{}, "get:Info")
 
-		// 客户端
+		// Clients
 		beego.Router("/api/client/list", &controllers.ClientController{}, "post:List")
 		beego.Router("/api/client/add", &controllers.ClientController{}, "post:Add")
 		beego.Router("/api/client/editremark", &controllers.ClientController{}, "post:EditRemark")
@@ -43,7 +43,7 @@ func registerAPIRoutes() {
 		beego.Router("/api/client/delprocess", &controllers.ClientController{}, "post:DelProcess")
 		beego.Router("/api/client/dellist", &controllers.ClientController{}, "post:DelList")
 
-		// 监听器
+		// Listeners
 		beego.Router("/api/listener/list", &controllers.ListenerController{}, "post:List")
 		beego.Router("/api/listener/add", &controllers.ListenerController{}, "post:Add")
 		beego.Router("/api/listener/edit", &controllers.ListenerController{}, "post:Edit")
@@ -53,7 +53,7 @@ func registerAPIRoutes() {
 		beego.Router("/api/listener/start", &controllers.ListenerController{}, "post:Start")
 		beego.Router("/api/listener/stop", &controllers.ListenerController{}, "post:Stop")
 
-		// 隧道
+		// Tunnels
 		beego.Router("/api/tunnel/list", &controllers.TunnelController{}, "post:List")
 		beego.Router("/api/tunnel/add", &controllers.TunnelController{}, "post:Add")
 		beego.Router("/api/tunnel/edit", &controllers.TunnelController{}, "post:Edit")
@@ -63,7 +63,7 @@ func registerAPIRoutes() {
 		beego.Router("/api/tunnel/start", &controllers.TunnelController{}, "post:Start")
 		beego.Router("/api/tunnel/stop", &controllers.TunnelController{}, "post:Stop")
 
-		// 文件
+		// Files
 		beego.Router("/api/file/getdisk", &controllers.FileController{}, "post:Getdisk")
 		beego.Router("/api/file/ls", &controllers.FileController{}, "post:Ls")
 		beego.Router("/api/file/mv", &controllers.FileController{}, "post:Mv")
@@ -89,7 +89,7 @@ func registerAPIRoutes() {
 		beego.Router("/api/download/dll", &controllers.DownloadController{}, "post:Dll")
 		beego.Router("/api/download/listendll", &controllers.DownloadController{}, "post:ListenDll")
 
-		// 安装
+		// Installation
 		beego.Router("/api/install/install", &controllers.InstallController{}, "post:Install")
 		beego.Router("/api/install/remove", &controllers.InstallController{}, "post:Remove")
 
@@ -98,11 +98,11 @@ func registerAPIRoutes() {
 		beego.Router("/api/runner/runplugin", &controllers.RunnerController{}, "post:RunPlugin")
 		beego.Router("/api/runner/upload", &controllers.RunnerController{}, "post:Upload")
 
-		// 设置
+		// Settings
 		beego.Router("/api/setting/edit", &controllers.SettingController{}, "post:Edit")
 		beego.Router("/api/setting/get", &controllers.SettingController{}, "get:Get")
 
-		// 终端 / 屏幕（WebSocket）
+		// Terminal / 屏幕（WebSocket）
 		//
 		// 这两条路由不走 beego：SPA 的 WebSocket 端点由控制器直接 Hijack 连接
 		// （upgrade + 双向转发），而 beego 在控制器方法返回后会继续渲染视图——
@@ -115,11 +115,11 @@ func registerAPIRoutes() {
 		// and beego would afterwards try to render a view for the (already
 		// hijacked) response and fail with "Unknown view path:views".
 		//
-		// 终端（单发命令，POST）—— /api/terminal/ws 与 /api/screen/ws 见下方
+		// Terminal（单发命令，POST）—— /api/terminal/ws 与 /api/screen/ws 见下方
 		// registerStreamWSRoutes。
 		beego.Router("/api/terminal/shell", &controllers.TerminalController{}, "post:Shell")
 
-		// 截图
+		// Screenshots
 		beego.Router("/api/screenshot/get", &controllers.ScreenshotController{}, "get:Get")
 	})
 }

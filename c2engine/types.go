@@ -281,8 +281,6 @@ type Tunnel struct {
 	Health     *Health
 	RunStatus  bool
 }
-
-// Host 主机记录（引擎主机表，store+0x20）。
 // Host 主机记录（引擎主机表，store+0x20）。字段对应 hosts 表列（SQL schema）：
 // Id, Host, HeaderChange, HostChange, Location, Remark, Scheme, CertFilePath,
 // KeyFilePath, NoStore, IsClose, InletFlow, ExportFlow, FlowLimit, ClientId,

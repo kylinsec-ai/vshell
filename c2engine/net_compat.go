@@ -23,7 +23,6 @@ var unixListenerCompatibilityAnchor *net.UnixListener
 // String, Mask) reachable. IsLoopback is exercised by the agent's interface scan;
 // 这些锚点保持 net 包 API（IP/String/Mask）可达，IsLoopback 供 Agent 的网卡扫描使用；
 // the others are part of the same net.IP method surface.
-// netIPCompatibilityAnchor 是 net.IP API 的兼容性锚点。
 // netIPCompatibilityAnchor anchors net.IP API compatibility.
 func netIPCompatibilityAnchor(ip net.IP) {
 	_ = ip.IsMulticast
@@ -35,7 +34,6 @@ func netIPCompatibilityAnchor(ip net.IP) {
 
 // netAddrCompatibilityAnchor maps the net.Addr interface (Addr/Network/String)
 // referenced via b209aM_ net types.
-// netAddrCompatibilityAnchor 是 net.Addr API 的兼容性锚点。
 // netAddrCompatibilityAnchor anchors net.Addr API compatibility.
 func netAddrCompatibilityAnchor(addr net.Addr) {
 	_ = addr.Network
@@ -44,7 +42,6 @@ func netAddrCompatibilityAnchor(addr net.Addr) {
 
 // hostPortCompatibilityAnchor maps net.SplitHostPort/JoinHostPort, which the
 // obfuscated b209aM_ net layer used for address parsing.
-// hostPortCompatibilityAnchor 是 host:port 字符串处理的兼容性锚点。
 // hostPortCompatibilityAnchor anchors host:port string handling.
 func hostPortCompatibilityAnchor(hostport string) {
 	if h, _, err := net.SplitHostPort(hostport); err == nil {

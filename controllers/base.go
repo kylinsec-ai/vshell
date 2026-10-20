@@ -1,17 +1,8 @@
-// Package controllers — Web 管理面板控制器层，根据当前逆向证据重建；行为等价性仍需逐项验证反编译结果。
+// Package controllers implements the HTTP handlers for the web management interface.
 //
-// 对齐依据（全部来自 v_windows_amd64.exe 的可验证证据）：
-//   - funcnametab（raw 0x1d880020）中的真实类型与方法名：
-//     ApiBaseController + ClientController / FileController / ListenerController /
-//     TunnelController / DownloadController / LoginController / RunnerController /
-//     InstallController / TerminalController / DashboardController / ScreenController /
-//     SettingController / ScreenshotController。
-//   - 每个 handler 反编译中的真实请求参数名与 JSON 键（见 .re/decomp/）。
-//   - 内嵌前端 JS 中的真实路由路径（/client/list、/listener/add、/file/ls、…）。
-//
-// 原版基于 beego 框架：ApiBaseController 内嵌 beego.Controller，各业务控制器
-// 内嵌 ApiBaseController，JsonGet/JsonGetInt/JsonOkResult 等由编译器为每个
-// 控制器生成转发包装（funcnametab 中可见 ClientController.JsonGetInt 等）。
+// Some names and routes were reconstructed from available frontend and binary-analysis
+// artifacts. Those artifacts are evidence for individual symbols or paths, not proof of
+// complete runtime parity. Authentication and authorization must be reviewed per handler.
 package controllers
 
 import (

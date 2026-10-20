@@ -3,7 +3,6 @@ package c2engine
 import "encoding/binary"
 
 // ============================================================================
-// Agent 载荷资产模板与配置修补（对齐原版 DownloadController）
 // Agent payload asset templates and config patching (mirrors the original
 // DownloadController)
 // ============================================================================
@@ -74,7 +73,6 @@ var PoFamilyBStrings = []struct {
 }
 
 // ---------------------------------------------------------------------------
-// argv 条目（-<key>=<cipher>）
 // argv entry framing
 // ---------------------------------------------------------------------------
 

@@ -34,8 +34,6 @@ type Application struct {
 	// Process-local counters; persistence and synchronization depend on call sites.
 	stats AppStats
 }
-
-// AppStats 保存应用级统计信息。
 // AppStats holds application-level statistics.
 type AppStats struct {
 	StartTime      time.Time `json:"start_time"`
@@ -47,8 +45,6 @@ type AppStats struct {
 
 var app *Application
 var appOnce sync.Once
-
-// GetApplication 返回应用单例实例。
 // GetApplication returns the singleton application instance.
 func GetApplication() *Application {
 	appOnce.Do(func() {
@@ -66,8 +62,6 @@ func GetApplication() *Application {
 	})
 	return app
 }
-
-// Init 以配置初始化应用。
 // Init initializes the application with configuration.
 func (a *Application) Init(config *Config) error {
 	a.config = config
@@ -76,8 +70,6 @@ func (a *Application) Init(config *Config) error {
 	}
 	return nil
 }
-
-// StartBackground 启动全部后台服务。
 // StartBackground starts all background services.
 func (a *Application) StartBackground() {
 	a.healthCheck.Start()
@@ -96,8 +88,6 @@ func (a *Application) StartBackground() {
 
 	Logf("Application started with all background services")
 }
-
-// Stop 优雅关闭应用。
 // Stop gracefully shuts down the application.
 func (a *Application) Stop() {
 	a.connMgr.Stop()
@@ -125,8 +115,6 @@ func (a *Application) Stop() {
 }
 
 // Listener lifecycle management. The maps above track instances started here.
-
-// StartListener 按配置启动 C2 监听器。
 // StartListener starts a C2 listener by its configuration.
 func (a *Application) StartListener(config *Listener) error {
 	a.mu.Lock()
@@ -171,8 +159,6 @@ func (a *Application) StartListener(config *Listener) error {
 	Logf("Started listener %d (%s mode) on %s", config.ID, config.Mode, config.ListenAddr)
 	return nil
 }
-
-// StopListener 停止 C2 监听器。
 // StopListener stops a C2 listener.
 func (a *Application) StopListener(config *Listener) error {
 	a.mu.Lock()
@@ -201,28 +187,20 @@ func (a *Application) StopListener(config *Listener) error {
 }
 
 // Client-management adapters that delegate state changes to the engine or connection manager.
-
-// AddClient 注册新客户端并通知连接管理器。
 // AddClient registers a new client and notifies connection manager.
 func (a *Application) AddClient(client *Client) {
 	a.connMgr.RegisterClient(client.ID)
 }
-
-// DelClient 移除客户端。
 // DelClient removes a client.
 func (a *Application) DelClient(client *Client) {
 	a.connMgr.UnregisterClient(client.ID)
 	a.engine.DelClient(client.ID)
 }
-
-// GetClientCount 返回客户端总数与在线数。
 // GetClientCount returns total and online client counts.
 func (a *Application) GetClientCount() (total int, online int) {
 	stats := a.engine.GetStats()
 	return stats.TotalClients, stats.OnlineClients
 }
-
-// GetHealthFromClient 检查客户端健康状态。
 // GetHealthFromClient checks client health status.
 func (a *Application) GetHealthFromClient(clientID int64) *Client {
 	client := a.engine.GetClient(clientID)
@@ -231,8 +209,6 @@ func (a *Application) GetHealthFromClient(clientID int64) *Client {
 	}
 	return client
 }
-
-// SendLinkInfo 通过连接管理器发送链路元数据。
 // SendLinkInfo sends link metadata through the connection manager.
 func (a *Application) SendLinkInfo(clientID int64, info map[string]interface{}) {
 	a.connMgr.UpdateLinkInfo(clientID, info)

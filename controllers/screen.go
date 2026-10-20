@@ -1,15 +1,7 @@
-// Package controllers — 屏幕控制器，根据当前逆向证据重建；行为等价性仍需逐项验证。
-//
-// 真实方法（funcnametab + 反编译地址）与前端路由：
-//
-//	Ws  0x18eeee0   GET /api/screen/ws?id=<id>&quality=<q>&token=<token>  屏幕直播 WebSocket
-//
-// 前端内嵌 JS：`ws://host/api/screen/ws?id="+y+"&quality="+f+"&token="+g`。
-//
-// 前端只负责打开 WebSocket 并把每帧二进制数据 inflate 后交给 <img>
-// （static/assets/vl9djw6e1.js：`const O=te(r.data)`，te = pako inflate）。
-// 会话建立、采集启停、清晰度换算都在服务端完成——这就是 FUN_018eeee0 的职责：
-// 它按客户端 ID 建立屏幕会话，再把服务端 ↔ 代理的流式载荷原样转发给浏览器。
+// Package controllers implements screen-streaming HTTP handlers.
+// Session handling and stream behavior are defined by the current implementation;
+// historical reverse-engineering notes are not a substitute for tests.
+
 package controllers
 
 import (

@@ -80,8 +80,6 @@ import (
 // ============================================================================
 // Protocol message types
 // ============================================================================
-
-// CheckinRequest 是 Agent 注册/重连消息。
 // CheckinRequest is the agent registration/reconnection message.
 type CheckinRequest struct {
 	VerifyKey   string `json:"verify_key"`
@@ -94,8 +92,6 @@ type CheckinRequest struct {
 	PID         int    `json:"pid,omitempty"`
 	Version     string `json:"version,omitempty"`
 }
-
-// CheckinResponse 是服务器对 Agent 签到的响应。
 // CheckinResponse is the server's response to agent check-in.
 type CheckinResponse struct {
 	Status    string `json:"status"`
@@ -105,29 +101,21 @@ type CheckinResponse struct {
 	Timeout   int    `json:"timeout"`  // connection timeout in seconds
 	Message   string `json:"message,omitempty"`
 }
-
-// TaskRequest 是 Agent 的任务轮询请求。
 // TaskRequest is the agent's task polling request.
 type TaskRequest struct {
 	ClientID int64 `json:"client_id"`
 }
-
-// TaskResponse 包装发给 Agent 的待处理任务。
 // TaskResponse wraps pending tasks for an agent.
 type TaskResponse struct {
 	Tasks    []TaskItem `json:"tasks"`
 	Interval int        `json:"interval"`
 }
-
-// TaskItem 是单条待执行命令。
 // TaskItem is a single command to execute.
 type TaskItem struct {
 	ID      int64  `json:"id"`
 	Command string `json:"command"`
 	Timeout int    `json:"timeout"`
 }
-
-// ResultRequest 是 Agent 的任务结果提交。
 // ResultRequest is the agent's task result submission.
 //
 // VerifyKey proves the caller knows the listener key; the listener rejects
@@ -139,8 +127,6 @@ type ResultRequest struct {
 	Status    string `json:"Status"` // completed, failed, timeout
 	VerifyKey string `json:"VerifyKey,omitempty"`
 }
-
-// ResultResponse 确认收到结果。
 // ResultResponse acknowledges receipt.
 type ResultResponse struct {
 	Status   string `json:"status"`
@@ -150,16 +136,12 @@ type ResultResponse struct {
 // ============================================================================
 // Encryption helpers
 // ============================================================================
-
-// GenerateEncryptSalt 生成随机加密盐。
 // GenerateEncryptSalt creates a random encryption salt.
 func GenerateEncryptSalt() string {
 	b := make([]byte, 16)
 	rand.Read(b)
 	return hex.EncodeToString(b)
 }
-
-// FrameSaltKey 由监听器加密盐派生消息帧 AES 密钥。
 // FrameSaltKey derives the message-frame AES key from a listener salt.
 //
 // 证据分级（重要）：gdb 断点（session 537）抓到的是 **硬证据** —— AES 密钥
@@ -194,8 +176,6 @@ func FrameSaltKey(salt string) []byte {
 	hex.Encode(out, sum[:])
 	return out
 }
-
-// FrameEncrypt 按 agent 传输帧格式封装载荷并加密。
 // FrameEncrypt wraps and encrypts a payload in the agent's transport frame:
 //
 //	wire  = <u32 LE len><frame>
@@ -217,8 +197,6 @@ func FrameEncrypt(plaintext []byte, salt string) ([]byte, error) {
 	copy(out[4:], frame)
 	return out, nil
 }
-
-// FrameDecrypt 解析并解密 agent 传输帧（严格校验 4 字节小端长度头）。
 // FrameDecrypt parses and decrypts an agent transport frame, validating the
 // 4-byte little-endian length header.
 func FrameDecrypt(wire []byte, salt string) ([]byte, error) {
@@ -231,8 +209,6 @@ func FrameDecrypt(wire []byte, salt string) ([]byte, error) {
 	}
 	return Unframe(wire[4:], salt)
 }
-
-// Unframe 解密不带长度头的帧体（[12B nonce][ct][16B tag]）。
 // Unframe opens a frame body without the length header.
 func Unframe(frame []byte, salt string) ([]byte, error) {
 	gcm, err := newFrameGCM(salt)
@@ -245,8 +221,6 @@ func Unframe(frame []byte, salt string) ([]byte, error) {
 	nonce := frame[:gcm.NonceSize()]
 	return gcm.Open(nil, nonce, frame[gcm.NonceSize():], nil)
 }
-
-// newFrameGCM 由盐构建消息帧 AEAD。
 // newFrameGCM builds the message-frame AEAD from a salt.
 func newFrameGCM(salt string) (cipher.AEAD, error) {
 	block, err := aes.NewCipher(FrameSaltKey(salt))
@@ -271,8 +245,6 @@ func newFrameGCM(salt string) (cipher.AEAD, error) {
 // ============================================================================
 // Payload compression
 // ============================================================================
-
-// CompressPayload 使用 gzip 压缩载荷。
 // CompressPayload compresses a payload with gzip.
 func CompressPayload(data []byte) ([]byte, error) {
 	var buf bytes.Buffer
