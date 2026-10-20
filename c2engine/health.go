@@ -16,8 +16,6 @@ import (
 // Health Checker - periodic health monitoring for tunnels and hosts
 // 健康检查器——对隧道与反代 Host 的周期性健康监测
 // ============================================================================
-
-// HealthChecker 对隧道与反向代理执行周期性健康检查。
 // HealthChecker performs periodic health checks on tunnels and reverse proxies.
 type HealthChecker struct {
 	mu       sync.RWMutex
@@ -29,8 +27,6 @@ type HealthChecker struct {
 
 var healthChecker *HealthChecker
 var healthOnce sync.Once
-
-// GetHealthChecker 返回健康检查器单例。
 // GetHealthChecker returns the singleton health checker.
 func GetHealthChecker() *HealthChecker {
 	healthOnce.Do(func() {
@@ -42,8 +38,6 @@ func GetHealthChecker() *HealthChecker {
 	})
 	return healthChecker
 }
-
-// Start 开始周期性健康检查。
 // Start begins periodic health checking.
 func (hc *HealthChecker) Start() {
 	hc.mu.Lock()
@@ -57,8 +51,6 @@ func (hc *HealthChecker) Start() {
 	go hc.run()
 	Logf("Health checker started (interval: %v)", hc.interval)
 }
-
-// Stop 停止健康检查。
 // Stop halts health checking.
 func (hc *HealthChecker) Stop() {
 	hc.mu.Lock()
@@ -267,8 +259,6 @@ func (hc *HealthChecker) checkICMP(target string, health *Health) {
 // Periodic Maintenance - cleanup stale sessions, idle terminals, etc.
 // 周期性维护——清理过期会话、空闲终端等
 // ============================================================================
-
-// MaintenanceRunner 处理周期性清理任务。
 // MaintenanceRunner handles periodic cleanup tasks.
 type MaintenanceRunner struct {
 	mu       sync.RWMutex
@@ -280,8 +270,6 @@ type MaintenanceRunner struct {
 
 var maintenance *MaintenanceRunner
 var maintOnce sync.Once
-
-// GetMaintenanceRunner 返回维护运行器单例。
 // GetMaintenanceRunner returns the singleton maintenance runner.
 func GetMaintenanceRunner() *MaintenanceRunner {
 	maintOnce.Do(func() {
@@ -293,8 +281,6 @@ func GetMaintenanceRunner() *MaintenanceRunner {
 	})
 	return maintenance
 }
-
-// Start 开始周期性维护。
 // Start begins periodic maintenance.
 func (mr *MaintenanceRunner) Start() {
 	mr.mu.Lock()
@@ -308,8 +294,6 @@ func (mr *MaintenanceRunner) Start() {
 	go mr.run()
 	Logf("Maintenance runner started (interval: %v)", mr.interval)
 }
-
-// Stop 停止维护。
 // Stop halts maintenance.
 func (mr *MaintenanceRunner) Stop() {
 	mr.mu.Lock()
