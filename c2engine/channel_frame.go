@@ -1,6 +1,6 @@
 package c2engine
 
-// Channel 帧线协议（1:1 对齐服务端 tunnel/channel 反编译）。
+// Channel 帧线协议（对照逆向证据重建（尚需测试验证等价性）服务端 tunnel/channel 反编译）。
 //
 // 线格式（FUN_011b6ba0 构建 / FUN_011b7020 解析，会话 230-237 解码）：
 //
