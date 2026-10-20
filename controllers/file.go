@@ -1,26 +1,7 @@
-// Package controllers — 文件控制器，根据当前逆向证据重建；行为等价性仍需逐项验证。
-//
-// 真实方法（funcnametab + 反编译地址）与前端路由：
-//
-//	Getdisk           0x18e4780   POST /file/getdisk          磁盘列表
-//	Ls                0x18e4d80   POST /file/ls                目录列表
-//	Mv                0x18e5b40   POST /file/mv                移动/重命名
-//	Rm                0x18e60a0   POST /file/rm                删除文件
-//	RmList            0x18e6420   POST /file/rmlist            批量删除
-//	Cat               0x18e6700   POST /file/cat               查看文件内容
-//	Touch             0x18e6c40   POST /file/touch             创建文件
-//	Modifytime        0x18e6fa0   POST /file/modifytime        修改时间戳
-//	Mkdir             0x18e7400   POST /file/mkdir             创建目录
-//	Edit              0x18e78e0   POST /file/edit              编辑文件
-//	Wget              0x18e7c80   POST /file/wget              远程下载
-//	Upload            0x18e8060   POST /file/upload            上传文件
-//	DownloadToServer  0x18e8700   POST /file/downloadtoserver  下载到服务器
-//	GetDownloadPer    0x18e8f00   POST /file/getdownloadper    下载进度
-//	DownloadToBrowser 0x18e91a0   POST /file/downloadtobrowser 浏览器下载
-//	DownloadToOSS     0x18e93a0   POST /file/downloadtooss     下载到 OSS
-//
-// 说明：path 为远端目录，target 为文件名/目标段，命令按 path + "/" + target 拼接
-// （反编译 FUN_0044a940 为字符串 Join）；"|<-" 为多路径分隔符。
+// Package controllers implements HTTP handlers for file-management operations.
+// Handler behavior and response formats should be verified against the current
+// implementation and tests; reverse-engineering notes are not compatibility guarantees.
+
 package controllers
 
 import (
