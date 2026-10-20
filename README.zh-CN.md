@@ -1,18 +1,20 @@
+<div align="center">
+
 # VShell
 
-> **对在野利用的 C2 框架 "VShell" 的不完整逆向工程复刻**
+**逆向工程研究 · Go**
 
-[![Go Version](https://img.shields.io/badge/Go-1.25-blue)](https://go.dev/dl/)
-[![License](https://img.shields.io/badge/license-All%20Rights%20Reserved-red)](license.txt)
-[![English Docs](https://img.shields.io/badge/docs-English-blue)](README.md)
+基于二进制分析与行为验证，对 VShell v3.0 进行不完整、独立的重新实现研究。
 
-> **⚠️ 声明**
->
-> 本仓库是对在野利用的 C2 框架 **VShell**（v3.0）的 **不完整** 逆向工程产物，仅用于安全研究与学习交流。
->
-> - **仅供授权测试使用**，禁止用于任何非法用途。
-> - 与原版无关，原作者保留所有权利；本仓库不附带原版许可。
-> - 功能与原版存在差异，部分模块缺失或行为不一致。
+[English](README.md) · [简体中文](README.zh-CN.md)
+
+</div>
+
+> **研究声明：** 本项目尚未完成，仅用于授权环境中的安全研究与学习；与原作者无关联，不附带原版软件许可，功能和协议兼容性均不作保证。
+
+[![Go](https://img.shields.io/badge/Go-1.25-00ADD8?logo=go&logoColor=white)](https://go.dev/dl/)
+[![Research](https://img.shields.io/badge/方向-逆向工程-64748b)](#逆向工程状态)
+[![License](https://img.shields.io/badge/license-见%20license.txt-red)](license.txt)
 
 ---
 
