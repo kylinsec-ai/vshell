@@ -1,30 +1,7 @@
-// Package controllers — 载荷下载控制器，根据当前逆向证据重建；行为等价性仍需逐项验证。
-//
-// 真实方法（funcnametab + 反编译地址）与前端路由：
-//
-//	Stage      0x18dcd20   POST /download/stage      分阶段载荷（服务端托管）
-//	Stageless  0x18ddca0   POST /download/stageless  无阶段载荷（独立运行）
-//	Listen     0x18deec0   POST /download/listen     监听型载荷
-//	Shellcode  0x18e00e0   POST /download/shellcode  Shellcode 载荷
-//	Dll        0x18e2460   POST /download/dll        DLL 载荷
-//	ListenDll  0x18e3760   POST /download/listendll  监听型 DLL 载荷
-//
-// 反编译参数集（逐条 JsonGet* 调用核对）：
-//
-//	Stage:      id(FUN_018d9200,"id") / arch("arch")
-//	            + public/Expires/Pragma（FUN_018dc6c0 与响应头）
-//	Stageless:  id("id") / arch("arch") / proxy("proxy") / upx(FUN_018d92c0)
-//	Listen:     id("id") / host("host") / tp("tp") / arch("arch")
-//	            / vkey("vkey") / salt("salt") / upx / ebpf("ebpf")
-//	Shellcode:  id / arch / binary("binary") / public("public")
-//	Dll:        id / arch / public / Expires / Pragma / upx / vip / proxy
-//	ListenDll:  id / host / tp / arch / vkey / salt / upx
-//
-// 每个 handler 的响应都由 FUN_00c2a460 组装，字段顺序为
-//   "binary"（DAT_01bd9b33）+ 模板字节（或空）+
-//   "Expires"（DAT_01bdac68）+ DAT_01dbd4e60 的 span{0,0x330} +
-//   FUN_01913320 字符串 + "Pragma"（DAT_01bd97d9）+ "public"（DAT_01bda44b）
-// 即原版返回的是一个"可下载文件"（binary + 头字段），不是 JSON。
+// Package controllers implements HTTP handlers for artifact download requests.
+// Response formats and supported options reflect the current implementation and
+// should be validated with tests rather than inferred from historical analysis.
+
 package controllers
 
 import (
