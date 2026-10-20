@@ -1,11 +1,8 @@
 // Package utils provides notification helpers for configured DingDing and WeChat webhooks.
 //
-// The implementation can emit notifications for selected application events. The exact
-// compatibility with any separately analyzed binary is not guaranteed; webhook behavior
-// should be verified against tests and the providers' current API documentation.
-
-// Compatibility notes describe the current implementation, not guaranteed parity with another binary.
-// Verify security-sensitive assumptions through tests or direct review.
+// The implementation emits notifications for selected application events. Verify webhook
+// behavior against tests and current provider documentation; this does not establish parity
+// with any separately analyzed binary.
 
 package utils
 
@@ -28,7 +25,6 @@ import (
 // Notification types
 // ============================================================================
 
-// NotifyEvent 表示可触发通知的事件类型。
 // NotifyEvent represents a notification-triggering event.
 type NotifyEvent string
 
