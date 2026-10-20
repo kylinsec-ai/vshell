@@ -1,4 +1,4 @@
-// Package controllers — Web 管理面板控制器层，1:1 对齐原版二进制反编译结果。
+// Package controllers — Web 管理面板控制器层，根据当前逆向证据重建；行为等价性仍需逐项验证反编译结果。
 //
 // 对齐依据（全部来自 v_windows_amd64.exe 的可验证证据）：
 //   - funcnametab（raw 0x1d880020）中的真实类型与方法名：
