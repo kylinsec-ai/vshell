@@ -6,38 +6,32 @@ import (
 	"time"
 )
 
-// ============================================================================
-// Application Orchestrator (iVzmssZ.RuWw1_w equivalent)
-// 应用编排器（对应原版 iVzmssZ.RuWw1_w）
-// ============================================================================
+// Application coordinates engine state, listener lifecycles, client tracking,
+// and periodic maintenance tasks.
 //
-// RuWw1_w is the main application instance that wires together:
-// RuWw1_w 是串联以下组件的主应用实例：
-// - C2 engine (client/listener management)
-// - Listener activation/deactivation
-// - Client health monitoring
-// - Link information exchange
-// - Connection manager integration
-
-// Application 是整个 C2 框架的顶层编排器。
-// Application is the top-level orchestrator for the entire C2 framework.
+// Reverse-engineering symbol names below are research references, not public
+// API contracts. The current implementation may not reproduce every behavior
+// of the original binary; document confirmed behavior separately from hypotheses.
+//
+// Application 是应用层编排器，负责协调引擎、监听器、客户端状态与后台维护。
+// 逆向符号仅用于追踪分析，不代表接口契约或已完全复刻原版行为。
 type Application struct {
 	mu        sync.RWMutex
 	engine    *Engine
 	connMgr   *ConnectionManager
 	config    *Config
 
-	// Active listeners by mode
+	// Listener instances currently managed by this application, keyed by config ID.
 	httpListeners map[int64]*C2Listener
 	kcpListeners  map[int64]*KCPListener
 	dnsListeners  map[int64]*DNSListener
 
-	// Background services
+	// Long-running monitors started by StartBackground.
 	healthCheck *HealthChecker
 	maintenance *MaintenanceRunner
 	heartbeat   *HeartbeatMonitor
 
-	// Statistics
+	// Process-local counters; persistence and synchronization depend on call sites.
 	stats AppStats
 }
 
@@ -130,9 +124,7 @@ func (a *Application) Stop() {
 	a.engine.Save()
 }
 
-// ============================================================================
-// Listener management (iVzmssZ.RuWw1_w methods)
-// ============================================================================
+// Listener lifecycle management. The maps above track instances started here.
 
 // StartListener 按配置启动 C2 监听器。
 // StartListener starts a C2 listener by its configuration.
@@ -208,9 +200,7 @@ func (a *Application) StopListener(config *Listener) error {
 	return nil
 }
 
-// ============================================================================
-// Client management wrappers
-// ============================================================================
+// Client-management adapters that delegate state changes to the engine or connection manager.
 
 // AddClient 注册新客户端并通知连接管理器。
 // AddClient registers a new client and notifies connection manager.
@@ -258,12 +248,9 @@ func (a *Application) Ping(clientID int64) {
 	}
 }
 
-// ============================================================================
-// Connection Manager (ewfIYjbxro.Mizp3eoUC equivalent)
-// ============================================================================
-//
-// Mizp3eoUC manages per-client connection limits, flow accounting,
-// and connection lifecycle.
+// ConnectionManager tracks per-client connection metadata and runs periodic
+// cleanup. The reverse-engineered symbol is retained only as a research note;
+// verify behavioral equivalence against evidence and tests.
 
 // ConnectionManager enforces connection limits and tracks flow
 type ConnectionManager struct {
