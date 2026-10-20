@@ -14,6 +14,9 @@
 // 由于 c2engine 不能反向引用 controllers（会形成循环导入），查看者以
 // StreamViewer 接口注入：控制器实现它（底层是 gorilla/websocket 连接），
 // 引擎只负责按客户端 ID 路由。
+// Compatibility notes in this file describe the current implementation and available analysis evidence; they are not a guarantee of complete behavioral parity.
+// Treat security-sensitive assumptions as unverified until confirmed by tests or direct review.
+
 package c2engine
 
 import (
