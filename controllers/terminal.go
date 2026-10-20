@@ -1,4 +1,4 @@
-// Package controllers — 终端控制器，1:1 对齐原版二进制。
+// Package controllers — 终端控制器，根据当前逆向证据重建；行为等价性仍需逐项验证。
 //
 // 真实方法（funcnametab + 反编译地址）与前端路由：
 //
