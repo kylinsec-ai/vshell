@@ -3,7 +3,7 @@
 // 原版二进制中引擎分布在多个混淆包（iVzmssZ 数据层 / ewfIYjbxro 流控与监听 /
 // HD0BdtPxke、gKVghuo9m37N 载荷构建），其函数名在 funcnametab 中被剥离。
 // 以下签名全部来自控制器反编译中的调用形态（FUN_ 地址为 Ghidra 函数地址），
-// 引擎模块的 1:1 对齐将在后续阶段把这些调用替换为对应 FUN_ 的反编译还原。
+// 引擎模块的 对照逆向证据重建（尚需测试验证等价性）将在后续阶段把这些调用替换为对应 FUN_ 的反编译还原。
 package controllers
 
 import (
