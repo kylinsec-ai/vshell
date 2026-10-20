@@ -17,10 +17,10 @@ import (
 	"time"
 )
 
-// ============================================================================
-// C2 协议常量（1:1 对齐原版，反编译还原）
-// ============================================================================
-//
+// Protocol constants and layouts are based on the current reverse-engineering
+// notes. Treat exact compatibility as unverified unless supported by fixtures
+// or tests against known reference inputs and outputs.
+// 
 // 命令包构建器（FUN_01918400 / FUN_01918740，由控制器 DelFile/DelProcess 等
 // 调用）写入固定字节序列作为协议标记：
 //   FUN_01918400: 8f 97 93 8e 90 9c 47 8c 9e 94   （命令下发标记）
@@ -30,15 +30,10 @@ import (
 // 0x1197d00 / DelTask 0x1197da0 / GetTask 0x1197fe0 / GetTaskByMd5Password
 // 0x1197e20）；任务状态：pending/dispatched/running/completed/failed/timeout。
 
-// ============================================================================
-// C2 Protocol - Agent Communication Protocol
-// C2 协议——Agent 通信协议
-// ============================================================================
-//
-// The vshell C2 protocol uses HTTP/HTTPS for agent communication.
-// Messages are JSON-encoded with optional AES encryption.
-// vshell C2 协议基于 HTTP/HTTPS，消息 JSON 编码并可选 AES 加密。
-//
+// Protocol serialization helpers used by the current implementation.
+// The formats below describe observed or reconstructed behavior; they should
+// not be read as a complete protocol specification without test evidence.
+// 当前代码中的协议布局属于实现与逆向记录，未经测试验证的部分仍可能偏离样本。
 // Agent → Server (Check-in):
 // Agent → 服务器（签到）：
 //   POST /api/checkin
