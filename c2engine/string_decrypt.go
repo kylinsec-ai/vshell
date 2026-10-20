@@ -59,7 +59,6 @@ package c2engine
 //	    源阵列：MOV RSI,[0x1d3adcb] ; MOV ECX,0x135e ; REP MOVSQ   → 拷到 [RSP+0x9b28]
 //	    目标阵列：同法拷 [0x1d448ca] (0x135e*8 字节)            → 拷到 [RSP+0x29]
 //	    回写：MOV RAX,[0x1e431460] ; MOV [0x1e490a08],RAX      ; 池基址全局
-//	         MOV [0x1e490864],[RAX]      ; 池头第 1 个 dword
 //	         MOV [0x1e490867],[RAX+3]    ; 池头第 2 个 dword（错位 3 字节）
 //
 //	解码器 FUN_010952e0 @0x109b473（唯一在派发器内读池基址的指令）：
@@ -171,8 +170,6 @@ func PoEmit(seed byte, vals ...byte) []byte {
 	}
 	return out
 }
-
-// PoEmitVector 是家族 B 写字节语义的回归向量。
 // PoEmitVector pins family B's write semantics against the decompilation.
 type PoEmitVector struct {
 	Name string
