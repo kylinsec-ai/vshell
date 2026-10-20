@@ -1,5 +1,5 @@
-// Package utils/auth 实现 JWT 令牌、RBAC 角色权限与密码哈希等认证逻辑。
-// Package utils/auth implements JWT tokens, RBAC role permissions, and password hashing.
+// Package utils provides application authentication helpers, role checks, and password hashing.
+// Security note: comments describe current behavior, not a claim that these helpers meet production security requirements.
 package utils
 
 import (
@@ -21,8 +21,7 @@ var (
 	settingsMu   sync.RWMutex
 )
 
-// Settings 保存应用运行配置。
-// Settings holds application configuration.
+// Settings contains the authentication-related application configuration.
 type Settings struct {
 	License      string
 	MasterType   string
@@ -35,8 +34,7 @@ type Settings struct {
 	WebJWTSecret string
 }
 
-// GetSettings 返回应用配置（惰性初始化单例）。
-// GetSettings returns the application settings (lazily initialized singleton).
+// GetSettings returns the lazily initialized process-wide settings instance.
 func GetSettings() *Settings {
 	settingsOnce.Do(func() {
 		settings = &Settings{
@@ -55,22 +53,20 @@ func GetSettings() *Settings {
 	return settings
 }
 
-// GetJWTSecret 返回 JWT 签名密钥。
-// GetJWTSecret returns the JWT signing secret.
+// GetJWTSecret returns the configured JWT signing secret.
 func GetJWTSecret() string {
 	return GetSettings().WebJWTSecret
 }
 
-// generateJWTSecret 生成随机 JWT 密钥。
-// generateJWTSecret generates a random JWT secret.
+// generateJWTSecret creates a random secret for signing tokens.
 func generateJWTSecret() string {
 	b := make([]byte, 32)
 	rand.Read(b)
 	return hex.EncodeToString(b)
 }
 
-// JWTClaims 表示 JWT 令牌声明（与原版二进制格式一致）。
-// JWTClaims represents JWT token claims (matching original binary format).
+// JWTClaims contains the claims extracted by the token validation helpers.
+// Field presence and validation are determined by the current implementation.
 type JWTClaims struct {
 	TokenType string `json:"token_type"`
 	UserID    string `json:"user_id"`
@@ -80,15 +76,15 @@ type JWTClaims struct {
 	Iat       int64  `json:"iat"`
 }
 
-// 角色定义：与原版二进制一致 / Role definitions matching original binary
+// Role values used by the application's role checks.
 const (
 	RoleSuperAdmin = "super"
 	RoleAdmin      = "admin"
 	RoleUser       = "user"
 )
 
-// rolePermissions 定义各角色可访问的 API 路径前缀。
-// rolePermissions maps each role to the API path prefixes it may access.
+// rolePermissions maps each role to allowed API path prefixes.
+// Prefix matching is literal; review route normalization and authorization at call sites.
 var rolePermissions = map[string][]string{
 	RoleSuperAdmin: {"*"},
 	RoleAdmin: {
@@ -102,8 +98,7 @@ var rolePermissions = map[string][]string{
 	},
 }
 
-// GetRoleID 将角色值转换为角色 ID。
-// GetRoleID converts a role value into a role ID.
+// GetRoleID maps a role value to its string identifier; unknown values map to "0".
 func GetRoleID(role string) string {
 	switch role {
 	case RoleSuperAdmin:
@@ -117,8 +112,7 @@ func GetRoleID(role string) string {
 	}
 }
 
-// GetRoleName 将角色 ID 转换为可读名称。
-// GetRoleName converts a role ID into a human-readable name.
+// GetRoleName maps a role identifier to a display name.
 func GetRoleName(roleID string) string {
 	switch roleID {
 	case "1":
@@ -132,8 +126,8 @@ func GetRoleName(roleID string) string {
 	}
 }
 
-// HasPermission 判断某角色是否可访问指定路径（超级管理员永远放行）。
-// HasPermission checks whether a role may access a path (super admin always allowed).
+// HasPermission reports whether a role matches one of its configured path prefixes.
+// The super-admin role bypasses this check; callers must authenticate the role first.
 func HasPermission(roleValue string, path string) bool {
 	if roleValue == RoleSuperAdmin {
 		return true
@@ -150,8 +144,7 @@ func HasPermission(roleValue string, path string) bool {
 	return false
 }
 
-// UserInfoResponse 与原版 /api/getUserInfo 返回格式一致。
-// UserInfoResponse matches the original binary's /api/getUserInfo format.
+// UserInfoResponse is the response envelope used by the user-info endpoint.
 type UserInfoResponse struct {
 	Code    int      `json:"code"`
 	Message string   `json:"message"`
@@ -159,8 +152,7 @@ type UserInfoResponse struct {
 	Result  UserInfo `json:"result"`
 }
 
-// UserInfo 是用户信息详情。
-// UserInfo carries the user profile details.
+// UserInfo contains the profile fields returned to the client.
 type UserInfo struct {
 	Avatar   string         `json:"avatar"`
 	UserID   string         `json:"userId"`
@@ -172,23 +164,21 @@ type UserInfo struct {
 	Token    string         `json:"token"`
 }
 
-// RoleInfoResp 是角色信息。
-// RoleInfoResp carries role information.
+// RoleInfoResp describes a role in the user-info response.
 type RoleInfoResp struct {
 	RoleName string `json:"roleName"`
 	Value    string `json:"value"`
 }
 
-// GenerateToken 以默认超级管理员角色创建 JWT 令牌。
-// GenerateToken creates a JWT token with the default super-admin role.
+// GenerateToken creates a token using the default super-admin identifiers.
+// Do not expose this helper to untrusted callers; it does not perform authentication.
 func GenerateToken(username string) (string, error) {
 	return GenerateTokenWithRoles(username, "1", "1")
 }
 
-// GenerateTokenWithRoles 创建带 RBAC 声明的 JWT，格式与原版一致。
-// 原始格式：{"token_type":"jwt","user_id":"1","role_id":"1","username":"admin","exp":...,"iat":...}
-// GenerateTokenWithRoles creates a JWT token with RBAC claims matching the original binary.
-// Original format: {"token_type":"jwt","user_id":"1","role_id":"1","username":"admin","exp":...,"iat":...}
+// GenerateTokenWithRoles serializes the supplied identity and role fields into a signed token.
+// Claims are currently assembled with string formatting; callers should not assume arbitrary input
+// is safely JSON-escaped. Keep inputs trusted until serialization is replaced with encoding/json.
 func GenerateTokenWithRoles(username, userID, roleID string) (string, error) {
 	secret := GetJWTSecret()
 	now := time.Now()
@@ -207,15 +197,15 @@ func GenerateTokenWithRoles(username, userID, roleID string) (string, error) {
 	return signingInput + "." + sigB64, nil
 }
 
-// ValidateToken 校验 JWT 并返回用户名。
-// ValidateToken validates a JWT token and returns the username.
+// ValidateToken checks the token signature and expiration, then returns the username.
+// The current parser extracts fields textually rather than validating a complete JWT schema.
 func ValidateToken(tokenString string) (string, error) {
 	parts := strings.Split(tokenString, ".")
 	if len(parts) != 3 {
 		return "", errors.New("invalid token format")
 	}
 
-	// Verify signature
+	// Verify the signature over the encoded header and payload.
 	secret := GetJWTSecret()
 	signingInput := parts[0] + "." + parts[1]
 	sig := hmacSHA256([]byte(secret), []byte(signingInput))
@@ -225,7 +215,7 @@ func ValidateToken(tokenString string) (string, error) {
 		return "", errors.New("invalid token signature")
 	}
 
-	// Decode claims
+	// Decode the payload after signature verification.
 	claimsJSON, err := base64URLDecode(parts[1])
 	if err != nil {
 		return "", errors.New("invalid token payload")
@@ -233,13 +223,13 @@ func ValidateToken(tokenString string) (string, error) {
 
 	claimsStr := string(claimsJSON)
 
-	// Extract username
+	// Extract the username using the package's lightweight string parser.
 	username := extractJSONValue(claimsStr, "username")
 	if username == "" {
 		return "", errors.New("invalid token: missing username")
 	}
 
-	// Check expiration
+	// Reject an expired token when a positive exp value can be parsed.
 	exp := extractJSONValue(claimsStr, "exp")
 	if exp != "" {
 		expTime := parseInt64(exp)
@@ -251,8 +241,8 @@ func ValidateToken(tokenString string) (string, error) {
 	return username, nil
 }
 
-// ValidateTokenWithRole 校验 JWT 并返回完整声明（含角色信息）。
-// ValidateTokenWithRole validates a JWT token and returns full claims including role info.
+// ValidateTokenWithRole validates the signature and returns the supported identity and role fields.
+// It shares the textual claim parser and does not validate every registered JWT claim.
 func ValidateTokenWithRole(tokenString string) (*JWTClaims, error) {
 	parts := strings.Split(tokenString, ".")
 	if len(parts) != 3 {
@@ -297,14 +287,14 @@ func ValidateTokenWithRole(tokenString string) (*JWTClaims, error) {
 	return claims, nil
 }
 
-// CheckPassword 校验密码与存储哈希是否匹配（支持明文与 SHA256 哈希）。
-// CheckPassword verifies a password against the stored hash (plaintext or SHA256).
+// CheckPassword supports legacy plaintext values and unsalted SHA-256 hex digests.
+// Neither format is suitable for storing new passwords; prefer a password-hashing KDF such as Argon2id.
 func CheckPassword(password, stored string) bool {
 	if password == stored {
 		return true
 	}
 
-	// Check if stored is a SHA256 hash
+	// Treat a 64-character stored value as a candidate SHA-256 hex digest.
 	if len(stored) == 64 {
 		h := sha256.Sum256([]byte(password))
 		return hex.EncodeToString(h[:]) == stored
@@ -313,23 +303,22 @@ func CheckPassword(password, stored string) bool {
 	return false
 }
 
-// HashPassword 计算密码的 SHA256 十六进制哈希。
-// HashPassword creates a SHA256 hex hash of the password.
+// HashPassword returns an unsalted SHA-256 hex digest for legacy compatibility only.
+// Do not use this helper for new password storage.
 func HashPassword(password string) string {
 	h := sha256.Sum256([]byte(password))
 	return hex.EncodeToString(h[:])
 }
 
-// 以下为内部辅助函数 / Internal helpers below.
+// Internal encoding, signature, and claim-parsing helpers.
 
 func base64URLEncode(data []byte) string {
 	return strings.TrimRight(base64.URLEncoding.EncodeToString(data), "=")
 }
 
-// base64URLDecode 解码无填充的 URL-safe Base64。
 // base64URLDecode decodes unpadded URL-safe Base64.
 func base64URLDecode(s string) ([]byte, error) {
-	// Add padding
+	// Restore the padding omitted by base64URLEncode.
 	switch len(s) % 4 {
 	case 2:
 		s += "=="
@@ -339,16 +328,16 @@ func base64URLDecode(s string) ([]byte, error) {
 	return base64.URLEncoding.DecodeString(s)
 }
 
-// hmacSHA256 计算 HMAC-SHA256 签名。
-// hmacSHA256 computes an HMAC-SHA256 signature.
+// hmacSHA256 computes an HMAC-SHA256 message authentication code.
 func hmacSHA256(key, data []byte) []byte {
 	h := hmac.New(sha256.New, key)
 	h.Write(data)
 	return h.Sum(nil)
 }
 
-// extractJSONValue 从 JSON 字符串中提取指定键的值（避免引入完整 JSON 解析依赖）。
-// extractJSONValue extracts a key's value from a JSON string (avoids a full JSON parser).
+// extractJSONValue performs a minimal textual lookup for a string or number field.
+// It is not a JSON parser: escaped quotes, nested objects, whitespace variations, and duplicate keys
+// may be handled incorrectly. Use encoding/json before relying on untrusted token payloads.
 func extractJSONValue(json string, key string) string {
 	search := `"` + key + `":"`
 	idx := strings.Index(json, search)
@@ -375,8 +364,7 @@ func extractJSONValue(json string, key string) string {
 	return json[idx : idx+end]
 }
 
-// parseInt64 解析字符串开头的十进制整数。
-// parseInt64 parses a leading decimal integer from a string.
+// parseInt64 parses the leading decimal digits; it does not report overflow or trailing characters.
 func parseInt64(s string) int64 {
 	var n int64
 	for _, c := range s {
