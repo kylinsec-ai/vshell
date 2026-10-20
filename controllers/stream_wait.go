@@ -9,12 +9,8 @@ import (
 
 	"vshell/c2engine"
 )
-
-// shellWaitTimeout 是单发命令等待代理回包的上限。
 // shellWaitTimeout bounds how long a one-shot command waits for the agent.
 const shellWaitTimeout = 20 * time.Second
-
-// waitTaskResult 轮询任务，直到代理回包把状态从 pending/dispatched 推进到终态。
 // waitTaskResult polls a task until the agent's result submission moves it out
 // of pending/dispatched, or the timeout expires.
 //
