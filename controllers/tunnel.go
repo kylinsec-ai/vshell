@@ -1,15 +1,7 @@
-// Package controllers — 隧道控制器，根据当前逆向证据重建；行为等价性仍需逐项验证。
-//
-// 真实方法（funcnametab + 反编译地址）：
-//
-//	List       0x18f1140   POST /tunnel/list      分页隧道列表
-//	EditRemark 0x18f2880   POST /tunnel/editremark 修改备注
-//	DelList    0x18f2980   POST /tunnel/dellist    批量删除
-//	Del        0x18f2a40   POST /tunnel/del        删除单个
-//	Stop       0x18f2b40   POST /tunnel/stop       停止
-//	Start      0x18f2be0   POST /tunnel/start      启动
-//	Edit       0x18f2ce0   POST /tunnel/edit       编辑
-//	Add        0x18f31a0   POST /tunnel/add        新增
+// Package controllers implements tunnel-management HTTP handlers.
+// Supported operations and their effects reflect the current implementation and
+// should be verified through tests rather than assumed from historical analysis.
+
 package controllers
 
 // TunnelController 管理端口转发/隧道。
